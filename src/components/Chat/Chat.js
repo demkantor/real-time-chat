@@ -16,7 +16,7 @@ const Chat = ({ location }) => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
     // declares our url
-    const ENDPOINT = 'localhost:5000';
+    const ENDPOINT = 'https://tranquil-atoll-90149.herokuapp.com/';
 
     // handles when a user joins or leaves a room
     useEffect(() => {
