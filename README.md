@@ -1,7 +1,7 @@
 ## `real time chat`
     a simple and fun chat app
 
-### npm install
+### `npm install`
     this will get all needed dependencies
 
 ### `npm run dev`
