@@ -1,6 +1,7 @@
 const express = require('express');
 const socketio = require('socket.io');
 const http = require('http');
+const cors = require('cors');
 
 // get helper function middleware
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users.js');
@@ -12,6 +13,8 @@ const io = socketio(server);
 // sets the router for our server
 const router = require('./router');
 app.use(router);
+// set cors middleware
+app.use(cors());
 
 
 io.on('connection', (socket) => {
@@ -21,9 +24,11 @@ io.on('connection', (socket) => {
 
         if(error) return callback(error);
 
+        socket.join(user.room);
         socket.emit('message', { user: 'chat-bot', text: `${user.name} welcome to the room ${user.room}!` });
         socket.broadcast.to(user.room).emit('message', { user: 'chat-bot', text: `${user.name} has joined!!` });
-        socket.join(user.room);
+
+        io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
 
         callback();
     });
@@ -37,22 +42,17 @@ io.on('connection', (socket) => {
         callback();
     });
 
-
+    // handles user leaving a room
     socket.on('disconnect', () => {
         const user = removeUser(socket.id);
         if(user) {
             io.to(user.room).emit('message', { user: 'chat-bot', text: `${user.name} has left.` });
+            io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
+
         }
     });
 
 });
-
-
-
-
-
-
-
 
 
 // set server to port 5000
